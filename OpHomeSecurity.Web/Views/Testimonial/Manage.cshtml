@@ -1,0 +1,166 @@
+﻿@model OpHomeSecurity.Web.ViewModels.TestimonialViewModel
+@{
+    ViewBag.Title = "Manage";
+}
+<link rel="shortcut icon" type="image/x-icon" href="~/opfavicon.ico" />
+
+<h2>Manage Testimonial</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-4 col-lg-4">
+            @using (Html.BeginForm("CreateTestimonial", "Testimonial", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data", role = "form" }))
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Name)
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Location)
+                    @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Testimonial)
+                    @Html.TextAreaFor(m => m.Testimonial, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="Create" />
+                </div>
+            }
+        </div>
+        <div class="col-sm-12 col-md-8 col-lg-8">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Testimonial</th>
+                        <th></th>
+                    </tr>
+                    @foreach (var testimonial in Model.Testimonials)
+                    {
+                        <tr id="tr_@testimonial.TestimonialId">
+                            <td><span id="lblName_@testimonial.TestimonialId" class="nameLabel">@testimonial.ByName</span><input id="tbName_@testimonial.TestimonialId" type="text" value="@testimonial.ByName" class="hidden name" /></td>
+                            <td><span id="lblLocation_@testimonial.TestimonialId" class="locationLabel">@testimonial.Location</span><input id="tbLocation_@testimonial.TestimonialId" type="text" value="@testimonial.Location" class="hidden location" /></td>
+                            <td><span id="lblTestimonial_@testimonial.TestimonialId" class="testimonialLabel">@testimonial.Testimonial</span><input id="tbTestimonial_@testimonial.TestimonialId" type="text" value="@testimonial.Testimonial" class="hidden testimonial" /></td>
+                            <td><a id="btnEdit_@testimonial.TestimonialId" class="edit" data-testimonialid="@testimonial.TestimonialId" data-name="@testimonial.ByName" data-location="@testimonial.Location" data-testimonial="@testimonial.Testimonial">Edit</a><a data-testimonialid="@testimonial.TestimonialId" class="update hidden" id="btnUpdate_@testimonial.TestimonialId">Update</a> | <a id="btnRemove_@testimonial.TestimonialId" class="remove" data-testimonialid="@testimonial.TestimonialId">Remove</a><a id="btnCancel_@testimonial.TestimonialId" class="cancel hidden" data-testimonialid="@testimonial.TestimonialId">Cancel</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+
+        $('.edit').click(function () {
+
+            var testimonialId = $(this).data("testimonialid");
+            $('#lblName_' + testimonialId).addClass('hidden');
+            $('#lblLocation_' + testimonialId).addClass('hidden');
+            $('#lblTestimonial_' + testimonialId).addClass('hidden');
+            $(this).addClass('hidden');
+            $('#btnRemove_' + testimonialId).addClass('hidden');
+
+
+            $('#tbName_' + testimonialId).removeClass('hidden');
+            $('#tbLocation_' + testimonialId).removeClass('hidden');
+            $('#tbTestimonial_' + testimonialId).removeClass('hidden');
+            $('#btnUpdate_' + testimonialId).removeClass('hidden');
+            $('#btnCancel_' + testimonialId).removeClass('hidden');
+
+            console.log(testimonialId);
+
+        });
+
+        $('.update').click(function () {
+
+            var testimonialId = $(this).data("testimonialid");
+            var name = $('#tbName_' + testimonialId).val();
+            var location = $('#tbLocation_' + testimonialId).val();
+            var testimonial = $('#tbTestimonial_' + testimonialId).val();
+
+            var data = {
+                "model": {
+                    "TestimonialId": testimonialId,
+                    "ByName": name,
+                    "Location": location,
+                    "Testimonial": testimonial
+                }
+            };
+
+            $.ajax({
+                url: '@Url.Action("UpdateTestimonial", "Testimonial")',
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                data: data,
+                success: function (result) {
+                    $('#lblName_' + testimonialId).html(name);
+                    $('#lblLocation_' + testimonialId).html(location);
+                    $('#lblTestimonial_' + testimonialId).html(testimonial);
+
+                    $('#lblName_' + testimonialId).removeClass('hidden');
+                    $('#lblLocation_' + testimonialId).removeClass('hidden');
+                    $('#lblTestimonial_' + testimonialId).removeClass('hidden');
+                    $('#btnEdit_' + testimonialId).removeClass('hidden');
+                    $('#btnRemove_' + testimonialId).removeClass('hidden');
+
+                    $('#tbName_' + testimonialId).addClass('hidden');
+                    $('#tbLocation_' + testimonialId).addClass('hidden');
+                    $('#tbTestimonial_' + testimonialId).addClass('hidden');
+                    $('#btnUpdate_' + testimonialId).addClass('hidden');
+                    $('#btnCancel_' + testimonialId).addClass('hidden');
+                },
+                error: {
+
+                }
+            });
+
+        });
+
+        $('.cancel').click(function () {
+
+            var testimonialId = $(this).data("testimonialid");
+
+            $('#lblName_' + testimonialId).removeClass('hidden');
+            $('#lblLocation_' + testimonialId).removeClass('hidden');
+            $('#lblTestimonial_' + testimonialId).removeClass('hidden');
+            $('#btnEdit_' + testimonialId).removeClass('hidden');
+            $('#btnRemove_' + testimonialId).removeClass('hidden');
+
+
+            $('#tbName_' + testimonialId).addClass('hidden');
+            $('#tbLocation_' + testimonialId).addClass('hidden');
+            $('#tbTestimonial_' + testimonialId).addClass('hidden');
+            $('#btnUpdate_' + testimonialId).addClass('hidden');
+            $('#btnCancel_' + testimonialId).addClass('hidden');
+        });
+
+        $(".remove").click(function () {
+
+            var testimonialId = $(this).data("testimonialid");
+
+            var data = {
+                "testimonialId": testimonialId
+            };
+
+            $.ajax({
+                url: '@Url.Action("DeleteTestimonial", "Testimonial")',
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                data: data,
+                success: function (result) {
+                    $('#tr_' + testimonialId).remove();
+                },
+                error: {
+
+                }
+            });
+
+
+        });
+
+    </script>
+}

@@ -1,0 +1,81 @@
+﻿@model OpHomeSecurity.Web.ViewModels.AlbumViewModel
+@{
+    ViewBag.Title = "Manage";
+}
+<link rel="shortcut icon" type="image/x-icon" href="~/opfavicon.ico" />
+
+<h2>Manage Gallery</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            @using (Html.BeginForm("CreateAlbum", "Gallery", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data", role = "form" }))
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AlbumName)
+                    @Html.TextBoxFor(m => m.AlbumName, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IsFeatured)
+                    @Html.CheckBoxFor(m => m.IsFeatured)
+                </div>
+                <div class="form-group">
+                    <input id="tbSubmit" type="submit" value="Create" class="btn btn-sm btn-default" />
+                </div>
+            }
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <table class="table">
+                <tr>
+                    <th>Name</th>
+                    <th>Active</th>
+                    <th>Featured</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                @foreach (var album in Model.Albums)
+                {
+                    <tr id="tr_@album.AlbumId">
+                        <td>@album.AlbumName</td>
+                        <td>@album.IsActive</td>
+                        <td>@album.IsFeatured</td>
+                        <td>
+                            @*<a href='@Url.RouteUrl("ManageImages", new { albumid = album.AlbumId })'>Manage Images 1</a>*@
+                            <a href="~/Gallery/ManageImages?albumid=@album.AlbumId">Manage Images</a>
+                        </td>
+                        <td>
+                            <a href="#" class="removeAlbum" data-albumid="@album.AlbumId">Remove</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+
+        jQuery('.removeAlbum').click(function () {
+
+            var albumId = $(this).data("albumid");
+
+            var data = {
+                "albumid": albumId
+            };
+
+            $.ajax({
+                url: '@Url.Action("RemoveAlbum", "Gallery")',
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                data: data,
+                success: function (result) {
+                    $('#tr_' + albumId).remove();
+                },
+                error: {
+
+                }
+            });
+        });
+
+    </script>
+}
